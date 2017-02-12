@@ -238,6 +238,14 @@ apt-get -y install chromium-browser
 # Also install Chrome?
 apt-get -y install hardinfo
 
+# If we're running 14.04 (or 14.10, for that matter), also install the Pepper Flash Player Plugin only available from 14.04 onwards
+# Note that this package temporarily downloads Google Chrome in order to extract the Pepper Flash Player Plugin
+# Also note that this plugin uses plugin APIs not provided in Firefox
+if [ $DISTRIB_MAJOR_RELEASE -ge 14 ]; then
+	apt-get -y install pepperflashplugin-nonfree
+	update-pepperflashplugin-nonfree --install
+fi
+
 # Add spanish language support
 apt-get -y install language-pack-es
 apt-get -y install language-pack-gnome-es
