@@ -196,40 +196,11 @@ fi
 ###############
 ### Packages for All Releases
 ###############
-# Make sure an office suite is installed
-apt-get -y install libreoffice
-
-# Add codecs / plugins that most people want
-apt-get -y install ubuntu-restricted-extras
-apt-get -y install non-free-codecs
-apt-get -y install libdvdcss2
-
-# Add design / graphics programs
-apt-get -y install gimp
-apt-get -y install krita
-apt-get -y install inkscape
-
-# Add VLC and mplayer to play all multimedia
-# Need to justify installation of mplayer and totem-mozilla
-apt-get -y install vlc
-apt-get -y install mplayer
-apt-get -y install totem-mozilla
-
-# Misc Packages. Need to justify installation of each.
-apt-get -y install gcj-jre
-apt-get -y install ca-certificates
-apt-get -y install chromium-browser
-# Also install Chrome?
-apt-get -y install hardinfo
-apt-get -y install inxi
-apt-get -y install cdrdao
-
-# Add spanish language support
-apt-get -y install language-pack-es
-apt-get -y install language-pack-gnome-es
-
-# Install nonfree firmware for Broadcom wireless cards and TV capture cards
-apt-get -y install linux-firmware-nonfree firmware-b43-installer b43-fwcutter
+standard_packages=(libreoffice ubuntu-restricted-extras non-free-codecs libdvdcss2 gimp krita inkscape vlc mplayer totem-mozilla gcj-jre ca-certificates chromium-browser hardinfo inxi cdrdao language-pack-es language-pack-gnome-es linux-firmware-nonfree firmware-b43-installer b43-fwcutter)
+for i in "${standard_packages[@]}"
+do:
+	apt-get -y install $i
+done
 
 # Get rid of amarok, since vlc works much better.
 apt-get -y remove amarok
