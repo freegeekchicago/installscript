@@ -5,8 +5,7 @@ if [ -c /dev/video0 ]; then # check if video0 is a character device (if it exist
 	apt-get -y install cheese
 fi	
 }
-function ask() {
-# Function that makes a prompt	
+function ask() { # Function that makes a prompt	
     while true; do
  
         if [ "${2:-}" = "Y" ]; then
