@@ -1,25 +1,13 @@
 #!/bin/bash
-
-### Simple minded install script for
-### FreeGeek Chicago by David Eads
-### Updates by Brent Bandegar, Dee Newcum, James Slater, Alex Hanson, Benjamin Mintz, Duncan Steenburgh
-
-### Available on FreeGeek` Chicago's github Account at http://git.io/Ool_Aw
-
-### Import DISTRIB_CODENAME and DISTRIB_RELEASE
-. /etc/lsb-release
-
-### Get the integer part of $DISTRIB_RELEASE. Bash/test can't handle floating-point numbers.
-#DISTRIB_MAJOR_RELEASE=$(echo "scale=0; $DISTRIB_RELEASE/1" | bc) # but bc can, using redirections!
-
-
-echo "################################"
-echo "#  FreeGeek Chicago Installer  #"
-echo "################################"
-
-
-# Function that makes a prompt
-ask() {
+# Functions:
+function add_webcam {
+# Install cheese if the device has a webcam
+if [ -c /dev/video0 ]; then # check if video0 is a character device (if it exists, it is)
+	apt-get -y install cheese
+fi	
+}
+function ask() {
+# Function that makes a prompt	
     while true; do
  
         if [ "${2:-}" = "Y" ]; then
@@ -49,7 +37,7 @@ ask() {
  
     done
 }
-
+function modify_sources_list {
 ##################################
 # Edits to /etc/apt/sources.list #
 ##################################
@@ -103,157 +91,99 @@ else
     echo "* Setting Release Upgrades to 'never'"
     sed -i 's/Prompt=lts/Prompt=never/' /etc/update-manager/release-upgrades
 fi
-
-
-#######################
-# Add/Remove Packages #
-#######################
-
-### Update everything
-# We use dist-upgrade to ensure up-to-date kernels are installed
-apt-get -y update && apt-get -y dist-upgrade
-
-# On mint, dist-upgrade doesn't always update everything. 
-# If we're on mint, be sure to run the mintupdate-tool just in case
-if [ -x "$(command -v mintupdate-tool)" ]; then
-    echo 'Linux mint install detected. Running mintupdate-tool'
-    mintupdate-tool upgrade -r -k -s -y -l12345 --install-recommends
-fi
-
-# Each package should have it's own apt-get line.
-# If a package is not found or broken, the whole apt-get line is terminated.
-
-### Packages for Linux Mint 18.3 ###
-####################################
-if [ $(lsb_release -rs) = '18.3' ]; then
-    # Volman controls autoplay settings for xfce
-    if [ $(dpkg-query -W -f='${Status}' thunar-volman 2>/dev/null | grep -c "ok installed") -eq 1 ]; then
-        echo "Setting up autoplay for linux mint"
-        xfconf-query -c thunar-volman -p /autoplay-audio-cds/command -s "/usr/bin/vlc cdda://%d"
-        xfconf-query -c thunar-volman -p /autoplay-audio-cds/enabled -s true
-        xfconf-query -c thunar-volman -p /autoplay-video-cds/command -s "/usr/bin/vlc dvd://%d"
-        xfconf-query -c thunar-volman -p /autoplay-video-cds/enabled -s true
-    fi
-
-    # Add additional mint packages here
-fi
-
-### Packages for Trusty (14.04) ###
-###################################
-
+	}
+function install_general_programs {
+GENERAL_PROGRAMS=(
+'libreoffice' # Office Suite
+'ubuntu-restricted-extras' #codecs
+'non-free-codecs' #more codecs
+'libdvdcss2' #DVD Playback
+'gimp' #Image Editing Softwarwe
+'krita' #Vector graphics program
+'inkscape' #Vector Graphics Program
+'vlc' #Multi-format media player
+'mplayer' #Movie player
+'totem-mozilla' #media playback extension for Firefox.
+'gcj-jre' #Java
+'ca-certificates' #List of CA certificates (for safer browsing)
+'chromium-browser' # open-source web browser
+'hardinfo' # system information
+'inxi' # system information
+'cdrdao' #CD recording software
+'language-pack-es' #Spanish language support
+'language-pack-gnome-es' #Spanish language support
+'linux-firmware-nonfree' #TV capture card drivers.
+'firmware-b43-installer' #broadcom wireless drivers 
+'b43-fwcutter' #broadcom wireless drivers 
+)
+for program in ${GENERAL_PROGRAMS[*]};
+do
+	apt-get -y install "$program"
+done
+}
+function install_14_04_programs {
 # Auto-accept the MS Core Fonts EULA
-echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections
 
 # Add Pepper Flash Player support for Chromium
 # Note that this temporarily downloads Chrome, and the plugin uses plugin APIs not provided in Firefox
-if [ $(lsb_release -rs) = '14.04' ]; then
-    echo "* Customizing Trusty packages"
-    apt-get -y install pepperflashplugin-nonfree && update-pepperflashplugin-nonfree --install
-    add-apt-repository -y "deb http://archive.canonical.com/ $(lsb_release -sc) partner"
-    apt-get -y update
-    apt-get -y install adobe-flashplugin
-    apt-get -y install fonts-mgopen
+if [ "$(lsb_release -rs)" = '14.04' ]; then
+echo "* Customizing Trusty packages"
+apt-get -y install pepperflashplugin-nonfree &&
+update-pepperflashplugin-nonfree --install
+ apt-get -y install fonts-mgopen
+ fi
+}
+function install_kubuntu_programs {
+echo "* Customizing Trusty-Kubuntu packages."
+apt-get -y install software-center
+apt-get -y install kdewallpapers
+apt-get -y install kubuntu-restricted-extras
+apt-get -y autoremove muon muon-updater muon-discover
+}
+function install_xubuntu_programs {
+echo "* Customizing Trusty-Xubuntu packages."
+apt-get -y install xubuntu-restricted-extras
+apt-get -y remove gnumeric* abiword*
+echo "* Customizing Trusty-Xubuntu settings."
+apt-get -y install xmlstarlet
+# Make a system-wide fix so that Audio CDs autoload correctly.
+xmlstarlet ed -L -u '/channel/property[@name="autoplay-audio-cds"]/property[@name="command"]/@value' -v '/usr/bin/vlc cdda://' /etc/xdg/xdg-xubuntu/xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml
+### And now do it for the current user.
+xfconf-query -c thunar-volman -p /autoplay-audio-cds/command -s "/usr/bin/vlc cdda://"
 
-	# Kubuntu 14.04 Specific Packages
-	if [ $(dpkg-query -W -f='${Status}' kubuntu-desktop 2>/dev/null | grep -c "ok installed") -eq 1 ]; then
-	    echo "* Customizing Trusty-Kubuntu packages."
-	    apt-get -y install software-center
-	    apt-get -y install kdewallpapers
-	    apt-get -y install kubuntu-restricted-extras
-	    apt-get -y autoremove muon muon-updater muon-discover
-	fi
+# Make a system-wide fix so that Audio CDs autoload correctly.
+xmlstarlet ed -L -u '/channel/property[@name="autoplay-video-cds"]/property[@name="command"]/@value' -v '/usr/bin/vlc dvd://' /etc/xdg/xdg-xubuntu/xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml
+### And now do it for the current user.
+xfconf-query -c thunar-volman -p /autoplay-video-cds/command -s "/usr/bin/vlc dvd://"
 
-	# Xubuntu 14.04 Specific Packages
-	if [ $(dpkg-query -W -f='${Status}' xubuntu-desktop 2>/dev/null | grep -c "ok installed") -eq 1 ]; then
-	    echo "* Customizing Trusty-Xubuntu packages." 
-	    apt-get -y install xubuntu-restricted-extras
-	    apt-get -y remove gnumeric* abiword*
-        echo "* Customizing Trusty-Xubuntu settings."
-            apt-get -y install xmlstarlet
-            # Make a system-wide fix so that Audio CDs autoload correctly.
-            xmlstarlet ed -L -u '/channel/property[@name="autoplay-audio-cds"]/property[@name="command"]/@value' -v '/usr/bin/vlc cdda://' /etc/xdg/xdg-xubuntu/xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml
-            ### And now do it for the current user.
-            xfconf-query -c thunar-volman -p /autoplay-audio-cds/command -s "/usr/bin/vlc cdda://"
-
-            # Make a system-wide fix so that Audio CDs autoload correctly.
-            xmlstarlet ed -L -u '/channel/property[@name="autoplay-video-cds"]/property[@name="command"]/@value' -v '/usr/bin/vlc dvd://' /etc/xdg/xdg-xubuntu/xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml
-            ### And now do it for the current user.
-            xfconf-query -c thunar-volman -p /autoplay-video-cds/command -s "/usr/bin/vlc dvd://"
-
-            # Make a system-wide fix so that Mac eject key (X86Eject) is mapped to eject (eject -r) function.
-            xmlstarlet ed -L -s '/channel/property[@name="commands"]/property[@name="default"]' -t elem -n propertyTMP -v "" \
-                -i //propertyTMP -t attr -n "name" -v "X86Eject" \
-                -i //propertyTMP -t attr -n "type" -v "string" \
-                -i //propertyTMP -t attr -n "value" -v "eject" \
-                -r //propertyTMP -v property \
-            /etc/xdg/xdg-xubuntu/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
-            ### And now do it for the current user.
-            xfconf-query -c xfce4-keyboard-shortcuts -p /commands/default/XF86Eject -n -t string -s "eject"
-	fi
+# Make a system-wide fix so that Mac eject key (X86Eject) is mapped to eject (eject -r) function.
+xmlstarlet ed -L -s '/channel/property[@name="commands"]/property[@name="default"]' -t elem -n propertyTMP -v "" \
+  -i //propertyTMP -t attr -n "name" -v "X86Eject" \
+  -i //propertyTMP -t attr -n "type" -v "string" \
+  -i //propertyTMP -t attr -n "value" -v "eject" \
+  -r //propertyTMP -v property \
+/etc/xdg/xdg-xubuntu/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+### And now do it for the current user.
+xfconf-query -c xfce4-keyboard-shortcuts -p /commands/default/XF86Eject -n -t string -s "eject"
+}
+function install_mint_programs {
+mintupdate-tool upgrade -r -k -s -y -l12345 --install-recommends
+# Volman controls autoplay settings for xfce
+if [ "$(dpkg -s thunar-volman | grep "Status: install ok installed")" == "Status: install ok installed" ]; then
+echo "Setting up autoplay for linux mint"
+xfconf-query -c thunar-volman -p /autoplay-audio-cds/command -s "/usr/bin/vlc cdda://%d"
+xfconf-query -c thunar-volman -p /autoplay-audio-cds/enabled -s true
+xfconf-query -c thunar-volman -p /autoplay-video-cds/command -s "/usr/bin/vlc dvd://%d"
+xfconf-query -c thunar-volman -p /autoplay-video-cds/enabled -s true
 fi
-
-###############
-### Packages for All Releases
-###############
-# Make sure an office suite is installed
-apt-get -y install libreoffice
-
-# Add codecs / plugins that most people want
-apt-get -y install ubuntu-restricted-extras
-apt-get -y install non-free-codecs
-apt-get -y install libdvdcss2
-
-# Add design / graphics programs
-apt-get -y install gimp
-apt-get -y install krita
-apt-get -y install inkscape
-
-# Add VLC and mplayer to play all multimedia
-# Need to justify installation of mplayer and totem-mozilla
-apt-get -y install vlc
-apt-get -y install mplayer
-apt-get -y install totem-mozilla
-
-# Misc Packages. Need to justify installation of each.
-apt-get -y install gcj-jre
-apt-get -y install ca-certificates
-apt-get -y install chromium-browser
-# Also install Chrome?
-apt-get -y install hardinfo
-apt-get -y install inxi
-apt-get -y install cdrdao
-
-# Add spanish language support
-apt-get -y install language-pack-es
-apt-get -y install language-pack-gnome-es
-
-# Install nonfree firmware for Broadcom wireless cards and TV capture cards
-apt-get -y install linux-firmware-nonfree firmware-b43-installer b43-fwcutter
-
+}
+function remove_useless_programs {
 # Get rid of amarok, since vlc works much better.
 apt-get -y remove amarok
-
-# Install cheese if the device has a webcam
-if [ -c /dev/video0 ]; then # check if video0 is a character device (if it exists, it is)
-	apt-get -y install cheese
-fi
-
-# set up blu-ray playback
-apt-get -y  install libaacs0 libbluray-bdj libbluray1
-mkdir -p ~/.config/aacs/
-cd ~/.config/aacs/ && wget http://vlc-bluray.whoknowsmy.name/files/KEYDB.cfg
-cd ~
-
-# Fix Chromium Keyring Bug:
-# https://forum.manjaro.org/t/keyring-for-chromium-is-pointless/4328/4
-mv /usr/bin/gnome-keyring-daemon /usr/bin/gnome-keyring-daemon-old
-killall gnome-keyring-daemon
-
-###################################
-# Check for Apple as Manufacturer #
-###################################
-
-MANUFACTURER=`dmidecode -s system-manufacturer`
+}
+function apple_hardware {
+MANUFACTURER="$(dmidecode -s system-manufacturer)"
 if [ "$MANUFACTURER" = "Apple Inc." ]; then
     echo "You are using an $MANUFACTURER."
 
@@ -270,8 +200,22 @@ if [ "$MANUFACTURER" = "Apple Inc." ]; then
     # Run install.sh for updates
     echo "## Running apple_ubuntu.sh, BYE!"
     . /usr/local/bin/apple_ubuntu.sh
-fi
-
+fi	
+}
+function fix_bluray_playback {
+# set up blu-ray playback
+apt-get -y  install libaacs0 libbluray-bdj libbluray1
+mkdir -p ~/.config/aacs/
+cd ~/.config/aacs/ && wget http://vlc-bluray.whoknowsmy.name/files/KEYDB.cfg
+cd ~
+}
+function fix_chromium_bug {
+# Fix Chromium Keyring Bug:
+# https://forum.manjaro.org/t/keyring-for-chromium-is-pointless/4328/4
+mv /usr/bin/gnome-keyring-daemon /usr/bin/gnome-keyring-daemon-old
+killall gnome-keyring-daemon	
+}
+function end_install_script {
 ######################
 # Install and Run sl #
 ######################
@@ -291,5 +235,49 @@ if ask "Do you want to reboot now?" N; then
 else
     exit 0
 fi
+	}
+# Main Program Logic:
 
-## EOF
+echo "################################"
+echo "#  FreeGeek Chicago Installer  #"
+echo "################################"
+
+if [ "$(uname)" == "Linux" ] && [ "$(command -v apt-get)" == "/usr/bin/apt-get" ]; 
+	then echo "You're running a version of Linux that incorporates apt-get.";
+		modify_sources_list
+		apt-get -y update && apt-get -y dist-upgrade
+		dpkg --get-selections >before.txt
+		install_general_programs
+		remove_useless_programs
+		add_webcam
+		fix_bluray_playback
+		fix_chromium_bug
+		apple_hardware
+	if [ "$(less /etc/os-release | grep DISTRIB_CODENAME)" == "DISTRIB_CODENAME=trusty" ]; 
+		then echo "You're running a version of Ubuntu 14.04";
+		install_14_04_programs
+		if [ "$(dpkg -s xubuntu-desktop | grep "Status: install ok installed")" == "Status: install ok installed" ]; 
+			then echo "You're running Xubuntu 14.04";
+			install_xubuntu_programs
+		fi
+		if [ "$(dpkg -s kubuntu-desktop | grep "Status: install ok installed")" == "Status: install ok installed" ];
+			then echo "You're running Kubuntu 14.04";
+			install_kubuntu_programs
+		fi
+	fi
+	if [ "$(less /etc/os-release | grep UBUNTU_CODENAME)" == "UBUNTU_CODENAME=xenial" ]; 
+		then echo "You're running a version of Ubuntu 16.04";
+# Install general 16.04 stuff here. 
+# Some people have updated from 14.04.
+		if [ -x "$(command -v mintupdate-tool)" ]; 
+			then echo "You're running Linux Mint."; 
+			install_mint_programs
+		fi
+	fi
+	dpkg --get-selections >after.txt
+	diff -y before.txt after.txt >comparison.txt
+	rm before.txt after.txt
+	end_install_script
+else
+	echo "This script requires a Linux operating system with apt-get to work."
+fi
