@@ -27,6 +27,6 @@ wget -qO /usr/local/bin/install.sh https://raw.githubusercontent.com/freegeekchi
 
 # Run install.sh for updates
 echo "## Running install.sh, BYE!"
-sh /usr/local/bin/install.sh
+bash /usr/local/bin/install.sh
 
 #EOF
