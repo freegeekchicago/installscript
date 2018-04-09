@@ -1,7 +1,6 @@
 #!/bin/bash
 # Functions:
-function add_webcam {
-# Install cheese if the device has a webcam
+function add_webcam { # Install cheese if the device has a webcam
 if [ -c /dev/video0 ]; then # check if video0 is a character device (if it exists, it is)
 	apt-get -y install cheese
 fi	
