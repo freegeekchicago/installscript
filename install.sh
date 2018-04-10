@@ -116,7 +116,7 @@ GENERAL_PROGRAMS=(
 )
 for program in ${GENERAL_PROGRAMS[*]};
 do
-	apt-get -y install "$program"
+	apt-get -y install "$program" || "$program" "failed to install." >> errors.txt
 done
 }
 function install_14_04_programs {
