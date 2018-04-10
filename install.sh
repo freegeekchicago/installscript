@@ -134,9 +134,11 @@ update-pepperflashplugin-nonfree --install
 }
 function install_kubuntu_programs {
 echo "* Customizing Trusty-Kubuntu packages."
-apt-get -y install software-center
-apt-get -y install kdewallpapers
-apt-get -y install kubuntu-restricted-extras
+KUBUNTU_PROGRAMS=('software-center' 'kdewallpapers' 'kubuntu-restricted-extras')
+for program in ${KUBUNTU_PROGRAMS[*]};
+do
+	apt-get -y install "$program"
+done
 apt-get -y autoremove muon muon-updater muon-discover
 }
 function install_xubuntu_programs {
