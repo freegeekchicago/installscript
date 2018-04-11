@@ -23,7 +23,7 @@ fi
 # Pull fresh install.sh from github, store in /usr/local/bin
 echo "## Pulling fresh install.sh, OK."
 wget -qO /usr/local/bin/install.sh https://raw.githubusercontent.com/freegeekchicago/fgc-installscript/functions/install.sh
-## shorten address is http://git.io/Ool_Aw
+## shortened address is https://git.io/vxA2S
 
 # Run install.sh for updates
 echo "## Running install.sh, BYE!"
