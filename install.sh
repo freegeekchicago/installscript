@@ -35,10 +35,7 @@ function ask() { # Function that makes a prompt
  
     done
 }
-function modify_sources_list {
-##################################
-# Edits to /etc/apt/sources.list #
-##################################
+function modify_sources_list { #Make essential edits to /etc/apt/sources.list
 
 # Default sources.list already has:
 # <releasename> main restricted universe multiverse
@@ -57,7 +54,6 @@ fi
 
 ### Disable and Remove Any Medibuntu Repos
 #
-
 if [ -e /etc/apt/sources.list.d/medibuntu.list ]; then
     echo "* Removing Medibuntu Repos."
     rm /etc/apt/sources.list.d/medibuntu*
