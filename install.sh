@@ -220,11 +220,7 @@ function end_install_script {
     echo "Installation complete -- relax, and watch this STEAM LOCOMOTIVE"; sleep 2
     /usr/games/sl
 
-##################
-# Ask for reboot #
-##################
-
-if ask "Do you want to reboot now?" N; then
+if ask "Do you want to reboot now?" N; then # Ask for reboot
     echo "Rebooting now."
     reboot
 else
