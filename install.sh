@@ -88,7 +88,7 @@ fi
 	}
 function install_general_programs {
 GENERAL_PROGRAMS=(
-'libreoffice' # Office Suite
+'libreoffice' #Office Suite
 'ubuntu-restricted-extras' #codecs
 'non-free-codecs' #more codecs
 'libdvdcss2' #DVD Playback
@@ -100,9 +100,9 @@ GENERAL_PROGRAMS=(
 'totem-mozilla' #media playback extension for Firefox.
 'gcj-jre' #Java
 'ca-certificates' #List of CA certificates (for safer browsing)
-'chromium-browser' # open-source web browser
-'hardinfo' # system information
-'inxi' # system information
+'chromium-browser' #open-source web browser
+'hardinfo' #system information
+'inxi' #system information
 'cdrdao' #CD recording software
 'language-pack-es' #Spanish language support
 'language-pack-gnome-es' #Spanish language support
