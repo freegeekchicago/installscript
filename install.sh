@@ -118,15 +118,12 @@ done
 function install_14_04_programs {
 # Auto-accept the MS Core Fonts EULA
 echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections
-
 # Add Pepper Flash Player support for Chromium
 # Note that this temporarily downloads Chrome, and the plugin uses plugin APIs not provided in Firefox
-if [ "$(lsb_release -rs)" = '14.04' ]; then
 echo "* Customizing Trusty packages"
 apt-get -y install pepperflashplugin-nonfree &&
 update-pepperflashplugin-nonfree --install
  apt-get -y install fonts-mgopen
- fi
 }
 function install_kubuntu_programs {
 echo "* Customizing Trusty-Kubuntu packages."
