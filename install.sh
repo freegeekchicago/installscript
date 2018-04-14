@@ -178,9 +178,8 @@ xfconf-query -c thunar-volman -p /autoplay-video-cds/command -s "/usr/bin/vlc dv
 xfconf-query -c thunar-volman -p /autoplay-video-cds/enabled -s true
 fi
 }
-function remove_useless_programs {
-# Get rid of amarok, since vlc works much better.
-apt-get -y remove amarok
+function remove_useless_programs { 
+apt-get -y remove amarok #Get rid of amarok, since vlc works much better.
 }
 function apple_hardware {
 MANUFACTURER="$(dmidecode -s system-manufacturer)"
