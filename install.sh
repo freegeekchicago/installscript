@@ -130,6 +130,9 @@ apt-get -y install pepperflashplugin-nonfree &&
 update-pepperflashplugin-nonfree --install
  apt-get -y install fonts-mgopen
 }
+#function install_16_04_programs {
+#
+#}
 function install_kubuntu_programs {
 echo "* Customizing Trusty-Kubuntu packages."
 KUBUNTU_PROGRAMS=('software-center' 'kdewallpapers' 'kubuntu-restricted-extras')
@@ -260,7 +263,7 @@ if [ "$(uname)" == "Linux" ] && [ "$(command -v apt-get)" == "/usr/bin/apt-get" 
 	fi
 	if [ "$(less /etc/os-release | grep UBUNTU_CODENAME)" == "UBUNTU_CODENAME=xenial" ]; 
 		then echo "You're running a version of Ubuntu 16.04";
-# Install general 16.04 stuff here. 
+#install_16_04_programs
 # Some people have updated from 14.04.
 		if [ -x "$(command -v mintupdate-tool)" ]; 
 			then echo "You're running Linux Mint."; 
