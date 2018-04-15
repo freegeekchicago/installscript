@@ -1,7 +1,9 @@
 #!/bin/bash
 # Simple minded install script for
 # FreeGeek Chicago by David Eads
-# Updates by Brent Bandegar, Dee Newcum, James Slater, Alex Hanson, Benjamin Mintz, Duncan Steenburgh, and probably a bunch of others we've forgotten.
+# Updates by:
+# Brent Bandegar, Dee Newcum, James Slater, Alex Hanson, 
+# Benjamin Mintz, Duncan Steenburgh, and probably a bunch of others we've forgotten.
 # Functions:
 function add_webcam { # Install cheese if the device has a webcam
 if [ -c /dev/video0 ]; then # check if video0 is a character device (if it exists, it is)
