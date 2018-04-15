@@ -135,7 +135,11 @@ update-pepperflashplugin-nonfree --install
 #}
 function install_kubuntu_programs {
 echo "* Customizing Trusty-Kubuntu packages."
-KUBUNTU_PROGRAMS=('software-center' 'kdewallpapers' 'kubuntu-restricted-extras')
+KUBUNTU_PROGRAMS=(
+'software-center' #Ubuntu Software Center 
+'kdewallpapers' #Wallpapers for KDE
+'kubuntu-restricted-extras' #Multimedia stuff for Kubuntu
+)
 for program in ${KUBUNTU_PROGRAMS[*]};
 do
 	apt-get -y install "$program"
