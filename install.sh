@@ -119,6 +119,7 @@ for program in ${GENERAL_PROGRAMS[*]};
 do
 	apt-get -y install "$program" || "$program" "failed to install." >> errors.txt
 done
+#errors.txt should log all errors for apt-get, so we can see what has gone wrong.
 }
 function install_14_04_programs {
 # Auto-accept the MS Core Fonts EULA
