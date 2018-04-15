@@ -236,8 +236,8 @@ echo "################################"
 if [ "$(uname)" == "Linux" ] && [ "$(command -v apt-get)" == "/usr/bin/apt-get" ]; 
 	then echo "You're running a version of Linux that incorporates apt-get.";
 		modify_sources_list
-		apt-get -y update && apt-get -y dist-upgrade
-		dpkg --get-selections >before.txt
+		apt-get -y update && apt-get -y dist-upgrade #update and upgrade all software.
+		dpkg --get-selections >before.txt #list all packages installed on the system before the upgrade script runs.
 		install_general_programs
 		remove_useless_programs
 		add_webcam
@@ -265,9 +265,9 @@ if [ "$(uname)" == "Linux" ] && [ "$(command -v apt-get)" == "/usr/bin/apt-get" 
 			install_mint_programs
 		fi
 	fi
-	dpkg --get-selections >after.txt
-	diff -y before.txt after.txt >comparison.txt
-	rm before.txt after.txt
+	dpkg --get-selections >after.txt #List all packages installed on the system, after the script has been run.
+	diff -y before.txt after.txt >comparison.txt #create a list of packages installed by the update script.
+	rm before.txt after.txt #remove old lists of packages.
 	end_install_script
 else
 	echo "This script requires a Linux operating system with apt-get to work."
