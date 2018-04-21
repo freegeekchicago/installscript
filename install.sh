@@ -230,6 +230,11 @@ else
     exit 0
 fi
 	}
+function update_all_packages {
+apt-get -y update && apt-get -y dist-upgrade
+apt-get -y autoclean
+apt-get -y autoremove
+}
 # Main Program Logic:
 
 echo "################################"
@@ -239,7 +244,7 @@ echo "################################"
 if [ "$(uname)" == "Linux" ] && [ "$(command -v apt-get)" == "/usr/bin/apt-get" ]; 
 	then echo "You're running a version of Linux that incorporates apt-get.";
 		modify_sources_list
-		apt-get -y update && apt-get -y dist-upgrade #update and upgrade all software.
+		update_all_packages
 		dpkg --get-selections >before.txt #list all packages installed on the system before the upgrade script runs.
 		install_general_programs
 		remove_useless_programs
