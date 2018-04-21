@@ -207,29 +207,22 @@ if [ "$MANUFACTURER" = "Apple Inc." ]; then
     . /usr/local/bin/apple_ubuntu.sh
 fi	
 }
-function fix_bluray_playback {
-# set up blu-ray playback
+function fix_bluray_playback {# set up blu-ray playback
 apt-get -y  install libaacs0 libbluray-bdj libbluray1
 mkdir -p ~/.config/aacs/
 cd ~/.config/aacs/ && wget http://vlc-bluray.whoknowsmy.name/files/KEYDB.cfg
 cd ~
 }
-function fix_chromium_bug {
-# Fix Chromium Keyring Bug:
+function fix_chromium_bug {# Fix Chromium Keyring Bug:
 # https://forum.manjaro.org/t/keyring-for-chromium-is-pointless/4328/4
 mv /usr/bin/gnome-keyring-daemon /usr/bin/gnome-keyring-daemon-old
 killall gnome-keyring-daemon	
 }
 function end_install_script {
-######################
-# Install and Run sl #
-######################
-# Ensure installation completed without errors
-
     apt-get -y install sl
     echo "Installation complete -- relax, and watch this STEAM LOCOMOTIVE"; sleep 2
-    /usr/games/sl
-
+    /usr/games/sl # Install and Run sl
+    
 if ask "Do you want to reboot now?" N; then # Ask for reboot
     echo "Rebooting now."
     reboot
