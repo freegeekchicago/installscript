@@ -251,7 +251,7 @@ if [ "$(uname)" == "Linux" ] && [ "$(command -v apt-get)" == "/usr/bin/apt-get" 
 		install_general_programs
 		remove_useless_programs
 		add_webcam
-		fix_bluray_playback
+#		fix_bluray_playback
 		fix_chromium_bug
 		apple_hardware
 	if [ "$(less /etc/os-release | grep DISTRIB_CODENAME)" == "DISTRIB_CODENAME=trusty" ]; 
