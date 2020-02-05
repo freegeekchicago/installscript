@@ -62,6 +62,12 @@ log_pretty() {
 	printf "${NO_COLOR_FORMAT_STR}"
 }
 
+##################################
+# Take a snapshot with Timeshift #
+##################################
+
+timeshift --create --target /dev/sda1/timeshift --comments "Fresh Install"
+
 #######################
 # Add/Remove Packages #
 #######################
@@ -217,6 +223,12 @@ apt update -y && apt full-upgrade -y
 log_pretty "Cleaning up"
 apt autoclean -y
 apt autoremove -y
+
+##################################
+# Take a snapshot with Timeshift #
+##################################
+
+timeshift --create --target /dev/sda1/timeshift --comments "After install.txt"
 
 ######################
 # Install and Run sl #
